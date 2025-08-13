@@ -3,19 +3,21 @@ const bcrypt = require("bcryptjs");
 
 // Register user
 const registerUser = async (req, res) => {
-  const { username, email, password, imgUser } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ username });
     if (exists)
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({ message: "Username already registered" });
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
       username,
-      email,
       password: hashedPassword,
-      imgUser,
+      email: "",
+      imgUser: "",
     });
 
     res.status(201).json({ message: "User registered", user });
@@ -49,7 +51,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Get all users (optional)
+// Get all users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password"); // hide password
