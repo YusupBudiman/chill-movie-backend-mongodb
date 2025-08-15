@@ -5,10 +5,13 @@ const bcrypt = require("bcryptjs");
 const registerUser = async (req, res) => {
   const { username, password } = req.body;
 
+  if (password.length < 6) {
+    return res.status(400).json({ message: "Kata sandi minimal 6 karakter!" });
+  }
   try {
     const exists = await User.findOne({ username });
     if (exists)
-      return res.status(400).json({ message: "Username already registered" });
+      return res.status(400).json({ message: "Username telah terdaftar!" });
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -20,7 +23,7 @@ const registerUser = async (req, res) => {
       imgUser: "",
     });
 
-    res.status(201).json({ message: "User registered", user });
+    res.status(201).json({ message: "Pendaftaran berhasil", user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -32,10 +35,12 @@ const loginUser = async (req, res) => {
 
   try {
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: "Username not found" });
+    if (!user)
+      return res.status(400).json({ message: "Username tidak ditemukan!" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Kata sandi anda salah!" });
 
     res.json({
       message: "Login successful",
@@ -46,16 +51,6 @@ const loginUser = async (req, res) => {
         imgUser: user.imgUser,
       },
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// Get all users
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password"); // hide password
-    res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
