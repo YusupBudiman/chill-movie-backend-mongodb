@@ -1,12 +1,14 @@
 const Media = require("../models/Media");
-const cloudinary = require("../utils/cloudinary");
+// const cloudinary = require("../utils/cloudinary");
 
 // =========================
 // Add Media Controller
 // =========================
 const addMedia = async (req, res) => {
   try {
+    // =========================
     // Parsing genre
+    // =========================
     let genre = [];
     if (req.body.genre) {
       if (typeof req.body.genre === "string") {
@@ -16,7 +18,9 @@ const addMedia = async (req, res) => {
       }
     }
 
+    // =========================
     // Parsing cast
+    // =========================
     let cast = [];
     if (req.body.cast) {
       if (typeof req.body.cast === "string") {
@@ -26,7 +30,9 @@ const addMedia = async (req, res) => {
       }
     }
 
+    // =========================
     // Parsing seasons (untuk series)
+    // =========================
     let seasons = [];
     if (req.body.seasons && Array.isArray(req.body.seasons)) {
       seasons = req.body.seasons.map((s) => ({
@@ -46,6 +52,12 @@ const addMedia = async (req, res) => {
     }
 
     // =========================
+    // ❌ UPLOAD FILE DIMATIKAN TOTAL
+    // ❌ Tidak ada req.file / req.files
+    // ❌ Tidak ada cloudinary upload
+    // =========================
+
+    // =========================
     // Buat Media baru
     // =========================
     const media = await Media.create({
@@ -60,8 +72,11 @@ const addMedia = async (req, res) => {
       studio: req.body.studio || "",
       seasons,
       streaming: req.body.streaming || [],
-      imgLandscape: req.body.imgLandscape || "", // imgLandscapeUrl
-      imgPortrait: req.body.imgPortrait || "", // imgPortraitUrl
+
+      // ✅ Sekarang hanya terima URL/string dari frontend
+      imgLandscape: req.body.imgLandscape || "",
+      imgPortrait: req.body.imgPortrait || "",
+
       video: req.body.video || "",
     });
 
