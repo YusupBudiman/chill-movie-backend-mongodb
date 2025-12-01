@@ -1,12 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const connectDB = require("./config/db");
+const connectDB = require("../config/db");
 
-// Load environment variables
 dotenv.config();
-
-// Connect MongoDB
 connectDB();
 
 const app = express();
@@ -15,16 +12,16 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/movies", require("./routes/movieRoutes"));
+app.use("/api/users", require("../routes/userRoutes"));
+app.use("/api/movies", require("../routes/movieRoutes"));
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.send({ status: "OK", message: "Server is running" });
 });
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({ status: "error", message: "Route not found" });
 });
 
@@ -34,6 +31,16 @@ app.use((err, req, res, next) => {
   res.status(500).json({ status: "error", message: "Internal server error" });
 });
 
-// Run server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+/* 
+✅ INI KUNCI ANTI CRASH:
+- Local → listen
+- Vercel → export
+*/
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () =>
+    console.log(`✅ Local server running on port ${PORT}`)
+  );
+}
+
+module.exports = app; // ✅ untuk Vercel
